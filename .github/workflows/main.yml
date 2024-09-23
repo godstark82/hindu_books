@@ -39,7 +39,6 @@ jobs:
 
       # Extract version from pubspec.yaml
       - name: Extract version from pubspec.yaml
-        id: extract_version
         run: node get-version.js
 
       # Clean Cache
@@ -54,30 +53,11 @@ jobs:
       - name: Build APK
         run: flutter build apk --release --split-per-abi
 
-      # Build Web
-      - name: Build Web
-        run: flutter build web
-
-      # Adjust Base HREF
-      - name: Adjust Base HREF
-        run: sed -i 's|<base href="/">|<base href="/flixstar/">|' build/web/index.html
-
-      # Deploy To GitHub Pages
-      - name: Deploy To GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build/web
-
-      # Build Windows Release
-      - name: Build Windows Release
-        run: flutter build windows --release
-
       # Push to Releases
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
           artifacts: |
             build/app/outputs/apk/release/*
-          tag: ${{ steps.extract_version.outputs.version }}
+          tag: ${{ env.VERSION }} # Using the environment variable for version
           token: ${{ secrets.TOKEN }}
